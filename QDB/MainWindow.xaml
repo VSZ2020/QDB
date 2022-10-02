@@ -1,0 +1,130 @@
+﻿<Window x:Class="QDB.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:mv="clr-namespace:QDB.Views"
+        xmlns:cmd="clr-namespace:QDB.Views.Commands"
+        xmlns:local="clr-namespace:QDB"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <mv:MainWindowView
+            x:Key="mwView"
+            InfoMessageHeader="Привет"
+            InfoMessageText="Идет загрузка данных, пожалуйста, подождите!"
+            InfoMessageVisibility="False"/>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdOpen}" CanExecute="CommandBinding_CanExecute" Executed="Open_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdSave}" CanExecute="CommandBinding_CanExecute" Executed="Save_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdExit}" CanExecute="CommandBinding_CanExecute" Executed="Exit_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdAddQuestion}" CanExecute="CommandBinding_CanExecute" Executed="AddQuestion_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdEditQuestion}" CanExecute="CommandBinding_CanExecute" Executed="RemoveQuestion_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdRemoveQuestion}" CanExecute="CommandBinding_CanExecute" Executed="RemoveQuestion_Executed"/>
+    </Window.CommandBindings>
+    <Grid DataContext="{StaticResource mwView}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel
+            Grid.Row="0">
+            <Menu>
+                <MenuItem Header="Файл">
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdOpen}"/>
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdSave}"/>
+                    <Separator/>
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdExit}"/>
+                </MenuItem>
+                <MenuItem Header="Редактирование">
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdAddQuestion}"/>
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdEditQuestion}"/>
+                    <MenuItem Command="{x:Static cmd:MainWndCommands.cmdRemoveQuestion}"/>
+                </MenuItem>
+                <MenuItem Header="Инструменты">
+                    <Separator/>
+                    <MenuItem Header="Настройки"/>
+                </MenuItem>
+                <MenuItem Header="Помощь">
+                    <Separator/>
+                    <MenuItem Header="О программе" Click="btnAbout_Click"/>
+                </MenuItem>
+            </Menu>
+            <ToolBarTray MinHeight="26" Style="{StaticResource MainToolbarTrayStyle}">
+                <ToolBar Style="{StaticResource MainToolbarStyle}">
+                    <Button Content="New"/>
+                    <Button Content="Open" Command="{x:Static cmd:MainWndCommands.cmdOpen}"/>
+                    <Button Content="Save" Command="{x:Static cmd:MainWndCommands.cmdSave}"/>
+                </ToolBar>
+                <ToolBar Style="{StaticResource MainToolbarStyle}">
+                    <Button Content="A+" Command="{x:Static cmd:MainWndCommands.cmdAddQuestion}"/>
+                    <Button Content="E=" Command="{x:Static cmd:MainWndCommands.cmdEditQuestion}"/>
+                    <Button Content="R-" Command="{x:Static cmd:MainWndCommands.cmdRemoveQuestion}"/>
+                </ToolBar>
+                <ToolBar Style="{StaticResource MainToolbarStyle}">
+                    <Button Content="Generate"/>
+                </ToolBar>
+                <ToolBar Band="1" Style="{StaticResource MainToolbarStyle}">
+                    <TextBlock Text="Category" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <ComboBox 
+                        MinWidth="200"
+                        ItemsSource="{Binding Chapters}"
+                        SelectedValue="{Binding Path=SelectedChapter}"
+                        DisplayMemberPath="Header"
+                        SelectionChanged="Chapter_SelectionChanged"/>
+                    <TextBlock Text="Section" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                    <ComboBox 
+                        MinWidth="200"
+                        ItemsSource="{Binding Sections}"
+                        SelectedItem="{Binding Path=SelectedSection}"
+                        DisplayMemberPath="Header"
+                        SelectionChanged="Section_SelectionChanged"/>
+                </ToolBar>
+                <ToolBar Band="0" Style="{StaticResource MainToolbarStyle}">
+                    <ComboBox 
+                        Text="Search question" 
+                        MinWidth="150" 
+                        IsEditable="True"/>
+                    <Button Content="?" Width="20"/>
+                </ToolBar>
+                <ToolBar Header="Tester" Style="{StaticResource MainToolbarStyle}">
+                    <Button Content="Q-Editor" x:Name="TesterBtn_1"/>
+                    <Button Content="C-S-Editor" x:Name="TesterBtn_2"/>
+                </ToolBar>
+            </ToolBarTray>
+        </StackPanel>
+        <Grid
+            Grid.Row="1"
+            Panel.ZIndex="1"
+            Name="contentRegion">
+            <ListView 
+                MinHeight="200"
+                x:Name="questionsListView"
+                ItemsSource="{Binding Questions}"
+                SelectedValue="{Binding SelectedQuestion}">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="auto"/>
+                        <GridViewColumn Header="Difficulty" DisplayMemberBinding="{Binding Difficulty}" Width="50"/>
+                        <GridViewColumn Header="Type" DisplayMemberBinding="{Binding Type}" Width="auto"/>
+                        <GridViewColumn Header="Content" DisplayMemberBinding="{Binding Text}" Width="auto"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </Grid>
+        <Grid
+            Grid.Row="1"
+            Panel.ZIndex="2"
+            Style="{StaticResource InfoMessageGridStyle}"
+            Visibility="{Binding Path=InfoMessageVisibility, Converter={StaticResource infoMsgVisibilityConverter}}">
+            <Border
+                Style="{StaticResource InfoMessageBorderStyle}">
+                <StackPanel Margin="30">
+                    <TextBlock Text="{Binding Path=InfoMessageHeader}" Style="{StaticResource InfoMessageHeaderStyle}"/>
+                    <TextBlock Text="{Binding Path=InfoMessageText}" Style="{StaticResource InfoMessageContentStyle}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>

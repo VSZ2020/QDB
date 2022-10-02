@@ -1,0 +1,41 @@
+﻿<Window x:Class="QDB.Views.ChaptersListForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cmd="clr-namespace:QDB.Views.Commands"
+        xmlns:local="clr-namespace:QDB.Views"
+        mc:Ignorable="d"
+        Title="ChaptersListForm" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdAddChapter}" Executed="ChapterAdd_Executed"/>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdEditChapter}" Executed="ChapterEdit_Executed" CanExecute="ChapterEditRemove_CanExecute"/>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdRemoveChapter}" Executed="ChapterRemove_Executed" CanExecute="ChapterEditRemove_CanExecute"/>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdAddSection}" Executed="SectionAdd_Executed"/>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdEditSection}" Executed="SectionEdit_Executed" CanExecute="SectionEditRemove_CanExecute"/>
+        <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdRemoveSection}" Executed="SectionRemove_Executed" CanExecute="SectionEditRemove_CanExecute"/>
+    </Window.CommandBindings>
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock Text="Chapters"/>
+            <ListView
+                x:Name="lvChapters"
+                ItemsSource="{Binding Chapters}"
+                MinHeight="120"
+                DisplayMemberPath="Header"
+                SelectedValue="{Binding SelectedChapter}"/>
+            <Button Content="Add chapter" Name="BtnAddChapter" Command="{x:Static cmd:ChaptersEditCommands.cmdAddChapter}"/>
+            <Button Content="Edit chapter" Name="BtnEditChapter" Command="{x:Static cmd:ChaptersEditCommands.cmdEditChapter}"/>
+            <Button Content="Remove chapter" Name="BtnRemoveChapter" Command="{x:Static cmd:ChaptersEditCommands.cmdRemoveChapter}"/>
+            <TextBlock Text="Chapter sections"/>
+            <ListView
+                ItemsSource="{Binding ChapterSections}"
+                MinHeight="120"
+                DisplayMemberPath="Header"
+                SelectedValue="{Binding SelectedSection}"/>
+                <Button Content="Add section" Name="BtnAddSection" Command="{x:Static cmd:ChaptersEditCommands.cmdAddSection}"/>
+                <Button Content="Edit section" Name="BtnEditSection" Command="{x:Static cmd:ChaptersEditCommands.cmdEditSection}"/>
+                <Button Content="Remove section" Name="BtnRemoveSection" Command="{x:Static cmd:ChaptersEditCommands.cmdRemoveSection}"/>
+        </StackPanel>
+    </Grid>
+</Window>

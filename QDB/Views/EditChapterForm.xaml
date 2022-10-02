@@ -1,0 +1,17 @@
+﻿<Window x:Class="QDB.Views.EditChapterForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QDB.Views"
+        mc:Ignorable="d"
+        Title="Редактирование раздела" Height="auto" Width="270" SizeToContent="Height" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <StackPanel Margin="10">
+            <TextBlock Text="Введите название"/>
+            <TextBox Text="Раздел 1" x:Name="tbChapterHeader"/>
+            <Button Content="Подтвердить" IsDefault="True" x:Name="btnOk"/>
+            <Button Content="Отмена" IsCancel="True" x:Name="btnCancel"/>
+        </StackPanel>
+    </Grid>
+</Window>

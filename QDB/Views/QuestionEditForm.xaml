@@ -1,0 +1,81 @@
+﻿<Window x:Class="QDB.Views.QuestionEditForm"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QDB.Views"
+        xmlns:cmd="clr-namespace:QDB.Views.Commands"
+        mc:Ignorable="d"
+        Title="QuestionEditForm" Height="auto" Width="800" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static cmd:QuestionEditCommands.cmdAddAnswer}" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static cmd:QuestionEditCommands.cmdEditAnswer}" Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute"/>
+        <CommandBinding Command="{x:Static cmd:QuestionEditCommands.cmdRemoveAnswer}"  Executed="CommandBinding_Executed" CanExecute="CommandBinding_CanExecute"/>
+    </Window.CommandBindings>
+    <Grid>
+        <ScrollViewer>
+            <StackPanel>
+                <Menu>
+                    <MenuItem Header="Answer">
+                        <MenuItem Command="{x:Static cmd:QuestionEditCommands.cmdAddAnswer}"/>
+                        <MenuItem Command="{x:Static cmd:QuestionEditCommands.cmdEditAnswer}"/>
+                        <MenuItem Command="{x:Static cmd:QuestionEditCommands.cmdRemoveAnswer}"/>
+                    </MenuItem>
+                    <MenuItem Header="Chapters">
+                        <MenuItem Header="Edit"/>
+                    </MenuItem>
+                </Menu>
+                <TextBlock Text="Раздел вопроса"/>
+                <ComboBox 
+                    ItemsSource="{Binding Chapters}"
+                    SelectedValue="{Binding SelectedChapter}"
+                    DisplayMemberPath="Header"
+                    SelectionChanged="Chapter_SelectionChanged"/>
+                <Button Content="Add chapter"/>
+                <TextBlock Text="Подраздел вопроса"/>
+                <ComboBox 
+                    ItemsSource="{Binding Sections}"
+                    SelectedValue="{Binding SelectedSection}"
+                    DisplayMemberPath="Header"
+                    SelectionChanged="Section_SelectionChanged"/>
+                <Button Content="Add section"/>
+                <TextBlock Text="Тип вопроса"/>
+                <ComboBox
+                    ItemsSource="{Binding QuestionTypes}"
+                    SelectedValuePath="Key"
+                    SelectedValue="{Binding SelectedQuestionType}"
+                    DisplayMemberPath="Value"/>
+                <TextBlock Text="Сложность"/>
+                <ComboBox
+                    ItemsSource="{Binding Difficulties}"
+                    SelectedValue="{Binding SelectedDifficulty}"
+                    DisplayMemberPath="Name"
+                    SelectionChanged="Difficulty_SelectionChanged"/>
+                <TextBlock Text="Формулировка вопроса"/>
+                <RichTextBox
+                    x:Name="tbQuestionContent"
+                    Height="120"/>
+                <TextBlock Text="Прикрепить изображение"/>
+                <Button Content="Attach"/>
+                <TextBlock Text="Ответы"/>
+                <ListBox 
+                    x:Name="lvAnswers"
+                    ItemsSource="{Binding Answers}"
+                    SelectedItem="{Binding SelectedAnswer}"
+                    MinHeight="120"
+                    MouseDoubleClick="AnswersList_MouseDoubleClick">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <CheckBox Content="{Binding Content}" IsChecked="{Binding IsCorrect}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <Button Content="+" Name="BtnAddAnswer" Command="{x:Static cmd:QuestionEditCommands.cmdAddAnswer}"/>
+                <Button Content="E" Name="BtnEditAnswer" Command="{x:Static cmd:QuestionEditCommands.cmdEditAnswer}"/>
+                <Button Content="-" Name="BtnRemoveAnswer" Command="{x:Static cmd:QuestionEditCommands.cmdRemoveAnswer}"/>
+                <Button Content="Подтвердить" IsDefault="True" x:Name="btnOk"/>
+                <Button Content="Отмена" IsCancel="True" x:Name="btnCancel"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Window>
