@@ -20,6 +20,14 @@ namespace QDB.Database
                 context.SaveChanges();
             }
         }
+        public static void Add(IEnumerable<QDbSection> sections)
+        {
+            using (QDbContext context = QDbContext.GetInstance())
+            {
+                context.Sections.AddRange(sections);
+                context.SaveChanges();
+            }
+        }
         public static void Update(QDbSection section)
         {
             using (QDbContext context = QDbContext.GetInstance())
@@ -70,7 +78,7 @@ namespace QDB.Database
             }
         }
 
-        public static List<QDbSection> GetAll(int chapterId = 0)
+        public static List<QDbSection> GetAll(int chapterId = 0, bool includeServiceFields = true)
         {
             List<QDbSection> sections;
             using (QDbContext context = QDbContext.GetInstance())
@@ -82,8 +90,25 @@ namespace QDB.Database
                 else
                     sections = context.Sections.ToList();
             }
+            if (includeServiceFields)
+            {
+                //Добавляем служебный подраздел
+                sections.Insert(0, QDbSection.AddGeneralSection());
+            }
             return sections;
         }
+
+        public static int Count()
+        {
+            int count = 0;
+            using (QDbContext ctx = QDbContext.GetInstance())
+            {
+                //HACK: Slow method!
+                count = ctx.Sections.Count();
+            }
+            return count;
+        }
+
         public static void AddRange(this ObservableCollection<QDbSection> list, IEnumerable<QDbSection> sections)
         {
             foreach (var section in sections)

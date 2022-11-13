@@ -1,0 +1,61 @@
+﻿<Window x:Class="QDB.Views.QuestionTestGenerator"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:QDB.Views"
+        mc:Ignorable="d"
+        Title="QuestionTestGenerator" Height="auto" Width="510" WindowStartupLocation="CenterScreen" SizeToContent="Height">
+    <StackPanel Margin="10">
+        <GroupBox
+            Header="Exported file format">
+            <StackPanel>
+                <TextBlock Text="File type"/>
+                <ComboBox 
+                    x:Name="cbFileType"
+                    ItemsSource="{Binding Formats}"
+                    SelectedValue="{Binding SelectedFormatType}"
+                    SelectedValuePath="Key"
+                    DisplayMemberPath="Value"/>
+                <TextBlock Text="Output file(s) path"/>
+                <TextBox x:Name="tbOutputPath"/>
+                <Button Content="..." Click="btnOutPath_Click"/>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox
+            Header="Generator preferences">
+            <StackPanel>
+                <TextBlock Text="Заголовок теста"/>
+                <TextBox Text="Вводный тест" x:Name="tbTestHeader"/>
+                <TextBlock Text="Variants amount"/>
+                <TextBox Text="1" x:Name="tbVariantsCount"/>
+                <TextBlock Text="Questions count"/>
+                <TextBox Text="10" x:Name="tbQuestionsCount"/>
+                <TextBlock Text="Included chapters"/>
+                <StackPanel>
+                    <TextBlock 
+                        Text="Chapters by question Ids: [], [], [], [], []"
+                        TextWrapping="Wrap"
+                        x:Name="lbChaptersById"/>
+                    <Button 
+                        Content="Choose chapters"
+                        x:Name="btnChooseChapters"
+                        Click="btnChooseChapters_Click"/>
+                </StackPanel>
+                <TextBlock 
+                    Text="Если количество разделов будет меньше количества вопросов, то для вопросов будут браться случайные разделы и выбранного списка"
+                    TextWrapping="Wrap"/>
+                <CheckBox 
+                    Content="Mix answers"
+                    x:Name="cboxMixAnswers"/>
+                <CheckBox 
+                    Content="Inclide correct answers file"
+                    x:Name="cboxIsCorrentAnswersFile"/>
+            </StackPanel>
+        </GroupBox>
+        <StackPanel Orientation="Horizontal" FlowDirection="RightToLeft">
+            <Button Content="Cancel" IsCancel="True" x:Name="btnCancel"/>
+            <Button Content="Generate" IsDefault="True" x:Name="btnOk" Click="btnOk_Click"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

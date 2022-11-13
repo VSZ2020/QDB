@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="QDB.UserControls.ChapterSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:QDB.UserControls"
+             mc:Ignorable="d" d:DesignWidth="500" Height="406">
+    <Grid>
+        <GroupBox
+            Header="{Binding GroupName}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ComboBox 
+                    Style="{StaticResource comboBoxStyle}"
+                    Grid.Row="0"
+                    ItemsSource="{Binding Difficulties}"
+                    DisplayMemberPath="Name"
+                    SelectedIndex="{Binding SelectedDifficultyIndex}"/>
+                <TreeView
+                    Grid.Row="1"
+                    ItemsSource="{Binding Chapters}"
+                    ScrollViewer.VerticalScrollBarVisibility="Visible">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Sections}">
+                            <CheckBox IsChecked="{Binding IsChecked}" Content="{Binding Chapter.Header}"/>
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox Content="{Binding Section.Header}" IsChecked="{Binding IsChecked, Mode=TwoWay}"/>
+                                </DataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </Grid>
+        </GroupBox>
+    </Grid>
+</UserControl>

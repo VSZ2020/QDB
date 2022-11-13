@@ -18,15 +18,20 @@
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdOpen}" CanExecute="CommandBinding_CanExecute" Executed="Open_Executed"/>
         <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdSave}" CanExecute="CommandBinding_CanExecute" Executed="Save_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdLoadFromText}" CanExecute="CommandBinding_CanExecute" Executed="ImportFrom_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdLoadFromExcel}" CanExecute="CommandBinding_CanExecute" Executed="ImportFrom_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdClearDatabase}" CanExecute="CommandBinding_CanExecute" Executed="Clear_Executed"/>
         <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdExit}" CanExecute="CommandBinding_CanExecute" Executed="Exit_Executed"/>
         <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdAddQuestion}" CanExecute="CommandBinding_CanExecute" Executed="AddQuestion_Executed"/>
-        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdEditQuestion}" CanExecute="CommandBinding_CanExecute" Executed="RemoveQuestion_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdEditQuestion}" CanExecute="CommandBinding_CanExecute" Executed="EditQuestion_Executed"/>
         <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdRemoveQuestion}" CanExecute="CommandBinding_CanExecute" Executed="RemoveQuestion_Executed"/>
+        <CommandBinding Command="{x:Static cmd:MainWndCommands.cmdGenerate}" CanExecute="CommandBinding_CanExecute" Executed="Generate_Executed"/>
     </Window.CommandBindings>
     <Grid DataContext="{StaticResource mwView}">
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <StackPanel
             Grid.Row="0">
@@ -34,6 +39,13 @@
                 <MenuItem Header="Файл">
                     <MenuItem Command="{x:Static cmd:MainWndCommands.cmdOpen}"/>
                     <MenuItem Command="{x:Static cmd:MainWndCommands.cmdSave}"/>
+                    <MenuItem Header="Import">
+                        <MenuItem Command="{x:Static cmd:MainWndCommands.cmdLoadFromText}"/>
+                        <MenuItem Command="{x:Static cmd:MainWndCommands.cmdLoadFromExcel}"/>
+                    </MenuItem>
+                    <MenuItem Header="База данных">
+                        <MenuItem Command="{x:Static cmd:MainWndCommands.cmdClearDatabase}"/>
+                    </MenuItem>
                     <Separator/>
                     <MenuItem Command="{x:Static cmd:MainWndCommands.cmdExit}"/>
                 </MenuItem>
@@ -63,21 +75,25 @@
                     <Button Content="R-" Command="{x:Static cmd:MainWndCommands.cmdRemoveQuestion}"/>
                 </ToolBar>
                 <ToolBar Style="{StaticResource MainToolbarStyle}">
-                    <Button Content="Generate"/>
+                    <Button Content="Generate" Command="{x:Static cmd:MainWndCommands.cmdGenerate}"/>
                 </ToolBar>
                 <ToolBar Band="1" Style="{StaticResource MainToolbarStyle}">
                     <TextBlock Text="Category" VerticalAlignment="Center" Margin="0,0,5,0"/>
                     <ComboBox 
+                        x:Name="cbChapters"
                         MinWidth="200"
                         ItemsSource="{Binding Chapters}"
-                        SelectedValue="{Binding Path=SelectedChapter}"
+                        SelectedValue="{Binding Path=SelectedChapterId}"
+                        SelectedValuePath="Id"
                         DisplayMemberPath="Header"
                         SelectionChanged="Chapter_SelectionChanged"/>
                     <TextBlock Text="Section" VerticalAlignment="Center" Margin="10,0,5,0"/>
-                    <ComboBox 
+                    <ComboBox
+                        x:Name="cbSections"
                         MinWidth="200"
                         ItemsSource="{Binding Sections}"
-                        SelectedItem="{Binding Path=SelectedSection}"
+                        SelectedValue="{Binding Path=SelectedSectionId}"
+                        SelectedValuePath="Id"
                         DisplayMemberPath="Header"
                         SelectionChanged="Section_SelectionChanged"/>
                 </ToolBar>
@@ -102,7 +118,8 @@
                 MinHeight="200"
                 x:Name="questionsListView"
                 ItemsSource="{Binding Questions}"
-                SelectedValue="{Binding SelectedQuestion}">
+                SelectedValue="{Binding SelectedQuestion}"
+                VerticalContentAlignment="Center">
                 <ListView.View>
                     <GridView>
                         <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="auto"/>
@@ -126,5 +143,10 @@
                 </StackPanel>
             </Border>
         </Grid>
+        <StatusBar
+            Grid.Column="0"
+            Grid.Row="2">
+            <Label Content="{Binding StatusLabelText}"/>
+        </StatusBar>
     </Grid>
 </Window>

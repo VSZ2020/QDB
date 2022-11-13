@@ -58,8 +58,20 @@ namespace QDB.Views
         public ObservableCollection<QDbQuestion> Questions { get; set; } = new ObservableCollection<QDbQuestion>();
 
         public QDbQuestion? SelectedQuestion { get; set; }
-        public QDbChapter? SelectedChapter { get; set; }
-        public QDbSection? SelectedSection { get; set; }
+        public int? SelectedChapterId { get; set; }
+        public int? SelectedSectionId { get; set; }
+
+        private string _statusLabelText = string.Empty;
+        public string StatusLabelText
+        {
+            get => _statusLabelText;
+            set
+            {
+                _statusLabelText = value;
+                OnRaised(nameof(StatusLabelText));
+            }
+        }
+
 
         #region INotifyPropertyChanged region
         public event PropertyChangedEventHandler? PropertyChanged;

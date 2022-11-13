@@ -25,6 +25,22 @@ namespace QDB.Views.Commands
             {
                 new KeyGesture(Key.S, ModifierKeys.Control)
             });
+        public static RoutedUICommand cmdGenerate = new RoutedUICommand(
+            "Generate",
+            "Generate",
+            typeof(MainWindow));
+        public static RoutedUICommand cmdLoadFromText = new RoutedUICommand(
+            "From TXT",
+            "LoadFromText",
+            typeof(MainWindow));
+        public static RoutedUICommand cmdLoadFromExcel = new RoutedUICommand(
+            "From Excel",
+            "LoadFromExcel",
+            typeof(MainWindow));
+        public static RoutedUICommand cmdClearDatabase = new RoutedUICommand(
+            "Clear",
+            "ClearDatabase",
+            typeof(MainWindow));
         public static RoutedUICommand cmdExit = new RoutedUICommand(
             "Exit",
             "Exit",

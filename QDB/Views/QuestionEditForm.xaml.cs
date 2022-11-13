@@ -1,5 +1,6 @@
 ﻿using QDB.Controllers;
 using QDB.Database;
+using QDB.Database.Configurations;
 using QDB.Models;
 using QDB.Models.Answers;
 using QDB.Models.Questions;
@@ -46,11 +47,11 @@ namespace QDB.Views
             { QDbQuestion.QType.Match,  "Сопоставление" }
         };
         public List<QDbDifficulty> Difficulties { get; set; } = new List<QDbDifficulty>();
-        public QDbQuestion.QType SelectedQuestionType { get; set; }
-        public QDbChapter SelectedChapter { get; set; }
-        public QDbSection SelectedSection { get; set; }
-        public QDbDifficulty SelectedDifficulty { get; set; }
-        public QDbAnswer SelectedAnswer { get; set; }
+        public QDbQuestion.QType? SelectedQuestionType { get; set; }
+        public QDbChapter? SelectedChapter { get; set; }
+        public QDbSection? SelectedSection { get; set; }
+        public QDbDifficulty? SelectedDifficulty { get; set; }
+        public QDbAnswer? SelectedAnswer { get; set; }
         public QuestionEditForm(QDbQuestion? question)
         {
             InitializeComponent();
@@ -63,9 +64,9 @@ namespace QDB.Views
             {
                 _EditedQuestion = new QDbQuestion()
                 {
-                    Id = QuestionExtensions.Count(),
-                    ChapterId = -1,
-                    SectionId = -1,
+                    Id = QuestionExtensions.Count() + 1,
+                    ChapterId = QDatabaseConfig.AllCategoriesId,
+                    SectionId = QDatabaseConfig.AllCategoriesId,
                     Difficulty = 1,
                     Type = QDbQuestion.QType.Choise,
                     Text = "Input question text here..."
@@ -83,22 +84,15 @@ namespace QDB.Views
              * Загружаем список разделов
              */
             ReloadChapters();
-            //Выбираем раздел в зависимости от типа операции
-            if (_QuestionProcessingType == OperationType.Add)
-                SelectedChapter = Chapters[0];
-            else
-                SelectedChapter = Chapters.Where(c => c.Id == _EditedQuestion.ChapterId).FirstOrDefault() ?? Chapters[0];
+            //Выбираем раздел для вопроса
+            SelectedChapter = Chapters.Where(c => c.Id == _EditedQuestion.ChapterId).FirstOrDefault(Chapters[0]);
+            cbChapters.SelectedItem = SelectedChapter;
 
-            /*
-             * Загружаем список подразделов для данного раздела
-             */
-            //ReloadSections(Chapters[0]);
-            
-            //Выбираем первый подраздел как подраздел по-умолчанию
-            //if (_EditedQuestion.SectionId == -1)
-            //    SelectedSection = Sections[0];
-            //else
-            //    SelectedSection = Sections.Where(s => s.Id == _EditedQuestion.SectionId).FirstOrDefault() ?? Sections[0];
+            ReloadSections(SelectedChapter?.Id ?? QDatabaseConfig.AllCategoriesId);
+            //Выбираем подраздел
+            //TODO: Не отображается на форме выбранный/найденый подраздел
+            SelectedSection = Sections.Where(s => s.Id == _EditedQuestion.SectionId).FirstOrDefault(Sections[0]);
+            cbSections.SelectedItem = SelectedSection;
 
             /*
              * Загружаем варианты трудоемкости вопроса
@@ -106,10 +100,16 @@ namespace QDB.Views
             LoadDifficulties();
 
             //Выбираем трудоемкость из списка
-            SelectedDifficulty = Difficulties.Where(d => d.Id == _EditedQuestion.Difficulty).FirstOrDefault() ?? Difficulties[0];
+            SelectedDifficulty = Difficulties.Where(d => d.Id == _EditedQuestion.Difficulty).FirstOrDefault(Difficulties[0]);
+
+            //Выбираем тип вопроса
+            SelectedQuestionType = QuestionTypes.Where(qt => qt.Key == _EditedQuestion.Type).FirstOrDefault().Key;
 
             //Заполняем текст вопроса
-            tbQuestionContent.AppendText(_EditedQuestion.Text);
+            TextRange rng = new TextRange(
+                tbQuestionContent.Document.ContentStart,
+                tbQuestionContent.Document.ContentEnd);
+            rng.Text = _EditedQuestion.Text;
 
             //Задаем прикрепленное изображение вопроса, если есть
             AttachImage();
@@ -134,16 +134,10 @@ namespace QDB.Views
                 SelectedChapter = cachedChapter;
         }
 
-        private void ReloadSections(QDbChapter chapter)
+        private void ReloadSections(int chapterId)
         {
             Sections.Clear();
-            //Если выбран раздел "Все категории", то выводим все подкатегории всех категорий
-            if (chapter.Id == 1)
-                Sections.AddRange(SectionsExtensions.GetAll());
-            else
-            {
-                Sections.AddRange(SectionsExtensions.GetAll(chapter.Id));
-            }
+            Sections.AddRange(SectionsExtensions.GetAll(chapterId));
             //Добавляем служебные поля
             Sections.AddRange(QDbSection.AddServiceFields());
         }
@@ -153,6 +147,7 @@ namespace QDB.Views
         }
         private void RecreateAnswers()
         {
+            Answers.Clear();
             if (_QuestionProcessingType == OperationType.Edit)
             {
                 Answers.AddRange(AnswersExtensions.GetAll(_EditedQuestion.Id));
@@ -192,30 +187,56 @@ namespace QDB.Views
             }
         }
 
+        /// <summary>
+        /// Открывает окно добавления раздела в базу
+        /// </summary>
         private void AddChapterForm()
         {
             EditChapterForm ecf = new EditChapterForm();
             ecf.ShowDialog();
-            if(ecf.EditResult)
+            if (ecf.EditResult)
+            {
                 ReloadChapters();
+                if (Chapters.Count > 2) SelectedChapter = Chapters[^3];
+            }
+            else
+                cbChapters.SelectedItem = Chapters[0];
         }
 
+        /// <summary>
+        /// Открывает окно добавления подраздела в базу
+        /// </summary>
         private void AddSectionForm()
         {
-            EditSectionForm esf = new EditSectionForm(SelectedChapter.Id);
+            int chapterId = SelectedChapter.Id;
+            if (chapterId < 1)
+                chapterId = 1;
+
+            EditSectionForm esf = new EditSectionForm(chapterId);
             esf.ShowDialog();
             if (esf.EditResult)
-                ReloadSections(SelectedChapter);
+            {
+                ReloadSections(chapterId);
+                if (Sections.Count > 1) cbSections.SelectedItem = Sections[^2];
+            }
+            else
+                cbSections.SelectedItem = Sections[0];
         }
 
+        /// <summary>
+        /// Событие: Изменяется выбранный подраздел
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Chapter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedChapter != null)
             {
-                if (SelectedChapter.Id > -1)
+                int chapterId = SelectedChapter.Id;
+                if (chapterId > -1)
                 {
-                    _EditedQuestion.ChapterId = SelectedChapter.Id;
-                    ReloadSections(SelectedChapter);
+                    _EditedQuestion.ChapterId = chapterId;
+                    ReloadSections(chapterId);
                 }
                 else
                 {
@@ -230,16 +251,15 @@ namespace QDB.Views
 
         private void Section_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //ComboBox cbox = (ComboBox)e.Source;
-            //int addItemIndex = cbox.Items.Count - 1;
             if (SelectedSection != null)
             {
-                if (SelectedSection.Id > -1)
+                int sectionId = SelectedSection.Id;
+                if (sectionId > -1)
                 {
-                    _EditedQuestion.SectionId = SelectedSection.Id;
+                    _EditedQuestion.SectionId = sectionId;
                 }
                 else 
-                if (SelectedSection.Id == Configuration.ServiceFieldId_Add)
+                if (sectionId == Configuration.ServiceFieldId_Add)
                     AddSectionForm();
             }
         }
@@ -303,16 +323,12 @@ namespace QDB.Views
 
         private void Difficulty_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            _EditedQuestion.Difficulty = SelectedDifficulty.Id;
+            _EditedQuestion.Difficulty = SelectedDifficulty?.Id ?? 1;
         }
 
         private void AnswersList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (SelectedAnswer != null)
-            {
-                AnswerEditForm aef = new AnswerEditForm(SelectedAnswer.QuestionId, SelectedAnswer);
-                aef.ShowDialog();
-            }
+            QuestionEditCommands.cmdEditAnswer.Execute(null, BtnEditAnswer);
         }
 
         private void CommandBinding_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -332,15 +348,28 @@ namespace QDB.Views
             {
                 AnswerEditForm aef = new AnswerEditForm(this._EditedQuestion.Id);
                 aef.ShowDialog();
+                if (aef.EditCompleted)
+                    Answers.Add(aef.EditedAnswer);
             }
             if (e.Command == QuestionEditCommands.cmdEditAnswer)
             {
-                AnswerEditForm aef = new AnswerEditForm(this._EditedQuestion.Id, SelectedAnswer);
+                int selectedAnswerIndex = lvAnswers.SelectedIndex;
+                AnswerEditForm aef = new AnswerEditForm(this._EditedQuestion.Id, SelectedAnswer.Copy());
                 aef.ShowDialog();
+                if (aef.EditCompleted && selectedAnswerIndex > -1)
+                {
+                    Answers[selectedAnswerIndex] = aef.EditedAnswer;
+                    lvAnswers.Items.Refresh();
+                }
             }
             if (e.Command == QuestionEditCommands.cmdRemoveAnswer)
             {
-                Answers.Remove(SelectedAnswer);
+                if (SelectedAnswer != null)
+                {
+                    AnswersExtensions.Remove(SelectedAnswer);
+                    Answers.Remove(SelectedAnswer);
+                }
+                
                 //SelectedAnswer = null;
             }
         }

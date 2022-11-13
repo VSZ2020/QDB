@@ -25,7 +25,7 @@ namespace QDB.Views
     public partial class AnswerEditForm : Window
     {
         private ProcessOperationType _operation;
-        private QDbAnswer EditedAnswer { get; set; }
+        public QDbAnswer EditedAnswer { get; set; }
         public Dictionary<QDbAnswer.AType, string> AnswerTypes { get; set; } = new Dictionary<QDbAnswer.AType, string> {
             { QDbAnswer.AType.text, "Текстовый" },
             { QDbAnswer.AType.input,  "Ввод текста" },
@@ -35,6 +35,7 @@ namespace QDB.Views
         public string AnswerContent { get; set; } = "Input answer here";
         public QDbAnswer.AType SelectedAnswerType { get; set; }
         public bool IsAttachEnabled { get; set; } = false;
+        public bool EditCompleted = false;
         public AnswerEditForm(int questonId, QDbAnswer? answer = null)
         {
             InitializeComponent();
@@ -69,6 +70,7 @@ namespace QDB.Views
             {
                 if (CheckInputs())
                 {
+                    EditCompleted = true;
                     this.Close();
                 }
             };
@@ -90,12 +92,12 @@ namespace QDB.Views
             EditedAnswer.IsCorrect = IsCorrect;
             EditedAnswer.Type = SelectedAnswerType;
             EditedAnswer.Content = AnswerContent;
-            if (_operation == ProcessOperationType.Add)
-            {
-                AnswersExtensions.Add(EditedAnswer);
-            }
-            else
-                AnswersExtensions.Update(EditedAnswer);
+            //if (_operation == ProcessOperationType.Add)
+            //{
+            //    AnswersExtensions.Add(EditedAnswer);
+            //}
+            //else
+            //    AnswersExtensions.Update(EditedAnswer);
             return true;
         }
 

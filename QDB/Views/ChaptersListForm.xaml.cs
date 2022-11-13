@@ -1,4 +1,5 @@
 ﻿using QDB.Database;
+using QDB.Database.Configurations;
 using QDB.Models;
 using QDB.Utils.Logging;
 using QDB.Views.Commands;
@@ -43,14 +44,14 @@ namespace QDB.Views
             lvChapters.SelectionChanged += LvChapters_SelectionChanged;
             ReloadChapters();
             if (Chapters.Count > 0) 
-                ReloadSections(Chapters[0]);
+                ReloadSections(Chapters[0].Id);
         }
 
         private void LvChapters_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (SelectedChapter != null)
             {
-                ReloadSections(SelectedChapter);
+                ReloadSections(SelectedChapter.Id);
             }
         }
 
@@ -89,7 +90,7 @@ namespace QDB.Views
         {
             if (SelectedChapter != null)
             {
-                if (SelectedChapter.Id == 1)
+                if (SelectedChapter.Id == QDatabaseConfig.UncategorizedId)
                 {
                     MessageBox.Show(
                         "Вы не можете удалить раздел по-умолчанию",
@@ -98,6 +99,14 @@ namespace QDB.Views
                         MessageBoxImage.Information);
                     return;
                 }
+                var result = MessageBox.Show(
+                        $"Вы уверены, что хотите удалить раздел '{SelectedChapter.Header}'? Все связанные вопросы автоматически будут перенесены в раздел 'Все разделы''",
+                        "Внимание",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Information);
+                //Если ответил Нет, то отмена операции.
+                if (result == MessageBoxResult.No)
+                    return;
                 ChaptersExtensions.Remove(SelectedChapter, true);
                 ReloadChapters();
                 HasChanges = true;
@@ -118,7 +127,7 @@ namespace QDB.Views
                 esf.ShowDialog();
                 if (esf.EditResult)
                 {
-                    ReloadSections(SelectedChapter);
+                    ReloadSections(SelectedChapter.Id);
                     HasChanges = true;
                 }
             }
@@ -135,7 +144,7 @@ namespace QDB.Views
                     esf.ShowDialog();
                     if (esf.EditResult)
                     {
-                        ReloadSections(SelectedChapter);
+                        ReloadSections(SelectedChapter.Id);
                         HasChanges = true;
                     }
                 }
@@ -154,50 +163,58 @@ namespace QDB.Views
         }
         private void RemoveSection()
         {
-            if (SelectedChapter == null)
+            //if (SelectedChapter == null)
+            //{
+            //    MessageBox.Show("Для начала выберите раздел","Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            //    return;
+            //}
+            if (SelectedSection == null)
             {
-                MessageBox.Show("Для начала выберите раздел","Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(
+                    "Не выбран подраздел для удаления!",
+                    "Внимание",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
                 return;
             }
-            if (SelectedSection != null)
+            if (SelectedSection.Id == QDatabaseConfig.UncategorizedId)
             {
-                if (SelectedChapter.Id == 1 && SelectedSection.Id == 1)
-                {
-                    MessageBox.Show(
-                        "Вы не можете удалить подраздел по-умолчанию",
-                        "Внимание",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-                    return;
-                }
-                SectionsExtensions.Remove(SelectedSection, true);
-                ReloadSections(SelectedChapter);
-                HasChanges = true;
-            }
-            else
                 MessageBox.Show(
-                    "Не выбран подраздел для удаления!", 
-                    "Внимание", 
-                    MessageBoxButton.OK, 
-                    MessageBoxImage.Warning);
+                    "Вы не можете удалить подраздел по-умолчанию",
+                    "Внимание",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+                return;
+            }
+            var result = MessageBox.Show(
+                    $"Вы уверены, что хотите удалить подраздел '{SelectedSection.Header}'? Все связанные вопросы автоматически будут перенесены в подраздел 'Все подразделы''",
+                    "Внимание",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Information);
+            //Если ответил Нет, то отмена операции.
+            if (result == MessageBoxResult.No)
+                return;
+            SectionsExtensions.Remove(SelectedSection, true);
+            ReloadSections(SelectedChapter.Id);
+            HasChanges = true;
+            
+                
         }
         private void ReloadChapters()
         {
             Chapters.Clear();
             var chpt = ChaptersExtensions.GetAll();
-            for (int i = 0; i < chpt.Count; i++)
-                Chapters.Add(chpt[i]);
+            Chapters.AddRange(chpt);
             if (Chapters.Count > 0)
                 SelectedChapter = Chapters[0];
         }
 
-        private void ReloadSections(QDbChapter chapter)
+        private void ReloadSections(int chapterId)
         {
             ChapterSections.Clear();
-            //Если выбран раздел "Все категории", то выводим все подкатегории всех категорий
-            var chpt = (chapter.Id == 1) ? SectionsExtensions.GetAll() : SectionsExtensions.GetAll(chapter.Id);
-            for (int i = 0; i < chpt.Count; i++)
-                ChapterSections.Add(chpt[i]);
+            //Выводим подкатегории в зависимости от ID раздела
+            var sections = SectionsExtensions.GetAll(chapterId);
+            ChapterSections.AddRange(sections);
             if (ChapterSections.Count > 0)
                 SelectedSection = ChapterSections[0];
         }
@@ -205,12 +222,12 @@ namespace QDB.Views
 
         private void ChapterEditRemove_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = SelectedChapter != null;
+            e.CanExecute = SelectedChapter != null && SelectedChapter.Id > QDatabaseConfig.UncategorizedId;
             
         }
         private void SectionEditRemove_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = SelectedSection != null;
+            e.CanExecute = SelectedSection != null && SelectedChapter.Id > QDatabaseConfig.UncategorizedId;
         }
 
         private void ChapterAdd_Executed(object sender, ExecutedRoutedEventArgs e) => AddChapter();

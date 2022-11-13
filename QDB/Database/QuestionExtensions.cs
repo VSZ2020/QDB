@@ -23,11 +23,29 @@ namespace QDB.Database
                 ctx.SaveChanges();
             }
         }
+
+        public static void Add(IEnumerable<QDbQuestion> questions)
+        {
+            using (QDbContext ctx = QDbContext.GetInstance())
+            {
+                ctx.Questions.AddRange(questions);
+                ctx.SaveChanges();
+            }
+        }
+
         public static void Update(QDbQuestion question)
         {
             using (QDbContext ctx = QDbContext.GetInstance())
             {
                 ctx.Questions.Update(question);
+                ctx.SaveChanges();
+            }
+        }
+        public static void Remove(QDbQuestion question)
+        {
+            using (QDbContext ctx = QDbContext.GetInstance())
+            {
+                ctx.Questions.Remove(question);
                 ctx.SaveChanges();
             }
         }
@@ -43,7 +61,7 @@ namespace QDB.Database
             using (QDbContext ctx = QDbContext.GetInstance())
             {
                 //HACK: Slow method!
-                count = ctx.Questions.Count() + 1;
+                count = ctx.Questions.Count();
             }
             return count;
         }
@@ -54,19 +72,22 @@ namespace QDB.Database
                 list.Add(item);
             }
         }
-        public static List<QDbQuestion> GetAll(int sectionId = 0)
+        public static List<QDbQuestion> GetAll(int chapterId = 0, int sectionId = 0)
         {
             List<QDbQuestion> questions = new List<QDbQuestion>();
             using (QDbContext ctx = QDbContext.GetInstance())
             {
-                if (sectionId > 0)
+                if (chapterId > 0)
                 {
-                    questions.AddRange(ctx.Questions.Where(q => q.SectionId == sectionId).ToList());
+                    if (sectionId > 0)
+                    {
+                        questions = ctx.Questions.Where(q => q.ChapterId == chapterId && q.SectionId == sectionId).ToList();
+                    }
+                    else
+                        questions = ctx.Questions.Where(q => q.ChapterId == chapterId).ToList();
                 }
                 else
-                {
-                    questions.AddRange(ctx.Questions.ToList());
-                }
+                    questions = ctx.Questions.ToList();
             }
             return questions;
         }

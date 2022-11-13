@@ -11,8 +11,11 @@ using System.Threading.Tasks;
 
 namespace QDB.Database.Configurations
 {
+    
     public class QDatabaseConfig
     {
+        public const int AllCategoriesId = 0;
+        public const int UncategorizedId = 1;
         public class QuestionsConfiguration : IEntityTypeConfiguration<QDbQuestion>
         {
             public void Configure(EntityTypeBuilder<QDbQuestion> builder)
@@ -27,7 +30,6 @@ namespace QDB.Database.Configurations
             public void Configure(EntityTypeBuilder<QDbAnswer> builder)
             {
                 builder.ToTable("Answers");
-                
             }
         }
 
@@ -36,8 +38,8 @@ namespace QDB.Database.Configurations
             public void Configure(EntityTypeBuilder<QDbChapter> builder)
             {
                 builder.ToTable("Chapters");
-                builder.HasData(new QDbChapter() { Id = 1, Header = "Все категории" });
-                //builder.HasData(new QDbChapter() { Id = 1, Header = "Без категории" });
+                //builder.HasMany(c => c.Sections).WithOne(s => s.Chapter);
+                builder.HasData(new QDbChapter() { Id = UncategorizedId, Header = "Без категории" });
             }
         }
         public class SectionConfiguration : IEntityTypeConfiguration<QDbSection>
@@ -45,8 +47,7 @@ namespace QDB.Database.Configurations
             public void Configure(EntityTypeBuilder<QDbSection> builder)
             {
                 builder.ToTable("Sections");
-                builder.HasData(new QDbSection() { Id = 1, Header = "Все подкатегории" });
-                //builder.HasData(new QDbSection() { Id = 1, Header = "Без подкатегории" });
+                builder.HasData(new QDbSection() { Id = UncategorizedId, Header = "Без подкатегории" });
             }
         }
         public class DifficultyConfiguration : IEntityTypeConfiguration<QDbDifficulty>

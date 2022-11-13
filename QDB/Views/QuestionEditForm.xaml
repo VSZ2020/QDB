@@ -26,14 +26,16 @@
                     </MenuItem>
                 </Menu>
                 <TextBlock Text="Раздел вопроса"/>
-                <ComboBox 
+                <ComboBox
+                    x:Name="cbChapters"
                     ItemsSource="{Binding Chapters}"
                     SelectedValue="{Binding SelectedChapter}"
                     DisplayMemberPath="Header"
                     SelectionChanged="Chapter_SelectionChanged"/>
                 <Button Content="Add chapter"/>
                 <TextBlock Text="Подраздел вопроса"/>
-                <ComboBox 
+                <ComboBox
+                    x:Name="cbSections"
                     ItemsSource="{Binding Sections}"
                     SelectedValue="{Binding SelectedSection}"
                     DisplayMemberPath="Header"
@@ -41,14 +43,16 @@
                 <Button Content="Add section"/>
                 <TextBlock Text="Тип вопроса"/>
                 <ComboBox
+                    x:Name="cbQuestionTypes"
                     ItemsSource="{Binding QuestionTypes}"
                     SelectedValuePath="Key"
                     SelectedValue="{Binding SelectedQuestionType}"
                     DisplayMemberPath="Value"/>
                 <TextBlock Text="Сложность"/>
                 <ComboBox
+                    x:Name="cbDifficulties"
                     ItemsSource="{Binding Difficulties}"
-                    SelectedValue="{Binding SelectedDifficulty}"
+                    SelectedItem="{Binding SelectedDifficulty}"
                     DisplayMemberPath="Name"
                     SelectionChanged="Difficulty_SelectionChanged"/>
                 <TextBlock Text="Формулировка вопроса"/>
@@ -66,7 +70,7 @@
                     MouseDoubleClick="AnswersList_MouseDoubleClick">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <CheckBox Content="{Binding Content}" IsChecked="{Binding IsCorrect}"/>
+                            <CheckBox Content="{Binding Content}" IsChecked="{Binding IsCorrect, NotifyOnSourceUpdated=True}" IsEnabled="False"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

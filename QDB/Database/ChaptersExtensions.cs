@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using QDB.Utils.Logging;
 using System.Collections.ObjectModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace QDB.Database
 {
@@ -17,6 +18,14 @@ namespace QDB.Database
             using (QDbContext context = QDbContext.GetInstance())
             {
                 context.Chapters.Add(chapter);
+                context.SaveChanges();
+            }
+        }
+        public static void Add(IEnumerable<QDbChapter> chapters)
+        {
+            using (QDbContext context = QDbContext.GetInstance())
+            {
+                context.Chapters.AddRange(chapters);
                 context.SaveChanges();
             }
         }
@@ -74,14 +83,30 @@ namespace QDB.Database
             }
         }
 
-        public static List<QDbChapter> GetAll()
+        public static List<QDbChapter> GetAll(bool includeServiceFields = true)
         {
             List<QDbChapter> chapters;
             using (QDbContext context = QDbContext.GetInstance())
             {
                 chapters = context.Chapters.ToList();
             }
+            if (includeServiceFields)
+            {
+                //Добавляем служебный раздел
+                chapters.Insert(0, QDbChapter.AddGeneralChapter());
+            }
             return chapters;
+        }
+
+        public static int Count()
+        {
+            int count = 0;
+            using (QDbContext ctx = QDbContext.GetInstance())
+            {
+                //HACK: Slow method!
+                count = ctx.Chapters.Count();
+            }
+            return count;
         }
         public static void AddRange(this ObservableCollection<QDbChapter> chaptersList, IEnumerable<QDbChapter> chapters)
         {

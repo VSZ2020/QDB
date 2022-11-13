@@ -6,7 +6,7 @@
         xmlns:cmd="clr-namespace:QDB.Views.Commands"
         xmlns:local="clr-namespace:QDB.Views"
         mc:Ignorable="d"
-        Title="ChaptersListForm" Height="450" Width="800" WindowStartupLocation="CenterScreen">
+        Title="ChaptersListForm" Height="auto" Width="800" WindowStartupLocation="CenterScreen" SizeToContent="Height">
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdAddChapter}" Executed="ChapterAdd_Executed"/>
         <CommandBinding Command="{x:Static cmd:ChaptersEditCommands.cmdEditChapter}" Executed="ChapterEdit_Executed" CanExecute="ChapterEditRemove_CanExecute"/>

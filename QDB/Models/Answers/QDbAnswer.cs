@@ -31,5 +31,17 @@ namespace QDB.Models.Answers
                 IsCorrect = false, 
                 Content = "Answer" };
         }
+
+        public QDbAnswer Copy()
+        {
+            return new QDbAnswer()
+            {
+                Id = Id,
+                Content = Content,
+                IsCorrect = IsCorrect,
+                QuestionId = QuestionId,
+                Type = Type
+            };
+        }
     }
 }

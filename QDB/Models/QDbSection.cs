@@ -1,5 +1,7 @@
 ﻿using QDB.Controllers;
+using QDB.Database.Configurations;
 using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,9 +15,10 @@ namespace QDB.Models
         public int ChapterId { get; set; }
         public string Header { get; set; } = string.Empty;
 
+        //public QDbChapter? Chapter { get; set; }
         public static QDbSection AddGeneralSection()
         {
-            return new QDbSection() { Id = 0, ChapterId = -1, Header = "Все подразделы" };
+            return new QDbSection() { Id = QDatabaseConfig.AllCategoriesId, ChapterId = QDatabaseConfig.AllCategoriesId, Header = "Все подразделы" };
         }
         public static List<QDbSection> AddServiceFields()
         {

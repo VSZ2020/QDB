@@ -19,7 +19,7 @@ namespace QDB.Database
                 context.SaveChanges();
             }
         }
-        public static void Add(List<QDbAnswer> answers)
+        public static void Add(IEnumerable<QDbAnswer> answers)
         {
             using (QDbContext context = QDbContext.GetInstance())
             {
@@ -77,6 +77,16 @@ namespace QDB.Database
             {
                 list.Add(item);
             }
+        }
+        public static int Count()
+        {
+            int count = 0;
+            using (QDbContext ctx = QDbContext.GetInstance())
+            {
+                //HACK: Slow method!
+                count = ctx.Answers.Count();
+            }
+            return count;
         }
     }
 }

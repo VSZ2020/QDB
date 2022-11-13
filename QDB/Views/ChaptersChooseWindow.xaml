@@ -1,0 +1,44 @@
+﻿<Window x:Class="QDB.Views.ChaptersChooseWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:cs="clr-namespace:QDB.UserControls"
+        xmlns:local="clr-namespace:QDB.Views"
+        mc:Ignorable="d"
+        Title="ChaptersChooseWindow" Height="464" Width="506" SizeToContent="Height" WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="0.25*"/>
+        </Grid.RowDefinitions>
+        <ListBox
+            x:Name="qList"
+            MinHeight="300"
+            ScrollViewer.VerticalScrollBarVisibility="Auto"
+            Grid.Row="0"
+            Grid.Column="0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <cs:ChapterSelector/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+        <StackPanel
+            Grid.Column="0"
+            Grid.Row="1">
+            <Button Content="Распределить по 1 разделу в каждый вопрос"/>
+            <Button Content="Выбрать все разделы" Click="btnSelectAll_Click"/>
+            <Button Content="Снять выделение со всех разделов" Click="btnUnselectAll_Click"/>
+            <Button Content="Выбрать всё" Click="btnSelectForAllQuestions_Click"/>
+            <Button Content="Снять всё" Click="btnUnselectForAllQuestions_Click"/>
+            <Button Content="Ок" IsDefault="True" Click="BtnOk_Click"/>
+            <Button Content="Отмена" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
